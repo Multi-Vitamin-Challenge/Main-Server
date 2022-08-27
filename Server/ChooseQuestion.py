@@ -23,7 +23,6 @@ def get_the_question_structure(question_type):
     x = requests.get(url)
     return json.loads(x.text)[question_type]
 
-
 def get_the_team_question(team_id):
     team_id = str(team_id)
     inp = f"Select idquestion FROM multivitamin.printed_questions WHERE idteam={team_id};"
@@ -32,7 +31,6 @@ def get_the_team_question(team_id):
 
 def check_rules(team_id):
     return len(list(get_the_team_question(team_id))) < int(config["Max_Question_team"])
-
 
 def choose_question(team_id, question_type):
     choice = []
@@ -84,8 +82,8 @@ def make_printer_request(team_id, question_type):
     req["score"] = str(- int(type_money(question_type))+ int(team_money(team_id)))
     url = config["Printer_URL"]+"/print"
     x = requests.post(url, json= req)
-    return json.loads(x.text)
-
+    return json.loads(x.text), question_number
+    
 if __name__=="__main__":
     #print(get_the_question_structure("set3"))
     #print(list(get_the_team_question(1001)))
