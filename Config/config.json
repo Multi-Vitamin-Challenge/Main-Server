@@ -2,5 +2,6 @@
     "Database_Username": "root",
     "Database_Password":"helloworld",
     "Database_host":"localhost",
-    "Database_name": "multivitamin"
+    "Database_name": "multivitamin",
+    "Printer_URL":"http://127.0.0.1:5000"
 }
