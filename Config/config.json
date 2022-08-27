@@ -1,8 +1,11 @@
 {
     "Database_Username": "root",
     "Database_Password":"helloworld",
+    "Printer_UserName": "admin",
+    "Printer_Password": "helloworld",
     "Database_host":"localhost",
     "Database_name": "multivitamin",
     "Printer_URL":"http://127.0.0.1:5000",
-    "Max_Question_team":"2"
+    "Max_Question_team":"4",
+    "Min_Score": "-10"
 }
