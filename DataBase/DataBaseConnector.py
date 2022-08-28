@@ -17,6 +17,7 @@ def run_without_ouput(sql):
     mycursor = mydb.cursor()
     mycursor.execute(sql)
     mydb.commit()
+    return mycursor.rowcount
 
 
 def run_with_output(sql):
