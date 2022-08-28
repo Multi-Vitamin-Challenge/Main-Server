@@ -7,6 +7,7 @@ import random
 from datetime import datetime
 
 def setup():
+    '''add Database folder to the path to import its files'''
     dir_path = os.path.dirname(os.path.realpath(__file__))
     dir_path = dir_path.split("\\")[:-1]
     dir_path.append("DataBase")
@@ -19,20 +20,32 @@ import DataBaseConnector
 config = ServerTools.read_config()
 
 def get_the_question_structure(question_type):
+    """make a request to the printer server and get the sturecture of the questions and return 
+    the questions of the input type"""
     url = config["Printer_URL"]+"/structure"
     x = requests.get(url)
     return json.loads(x.text)[question_type]
 
 def get_the_team_question(team_id):
+    """return all the questions of the input team"""
     team_id = str(team_id)
     inp = f"Select idquestion FROM multivitamin.printed_questions WHERE idteam={team_id};"
     for i in DataBaseConnector.run_with_output(inp):
         yield i[0]
 
+def get_the_team_question_in_hand(team_id):
+    """return the questions of the input team that haven't gaved back"""
+    team_id = str(team_id)
+    inp = f"Select idquestion FROM multivitamin.printed_questions WHERE idteam={team_id} AND status=0;"
+    for i in DataBaseConnector.run_with_output(inp):
+        yield i[0]
+
 def check_rules(team_id):
-    return len(list(get_the_team_question(team_id))) < int(config["Max_Question_team"])
+    """check if the team has less than max_question in hand"""
+    return len(list(get_the_team_question_in_hand(team_id))) < int(config["Max_Question_team"])
 
 def choose_question(team_id, question_type):
+    """choose a question for a team from a certain type and return the question id"""
     choice = []
     for i in get_the_question_structure(question_type):
         choice.append(i[:-4])
@@ -91,7 +104,8 @@ if __name__=="__main__":
     #print(give_question(1002, "set3"))
 #    print(team_money(1001))    
 #    print(give_question(1003, "set3#5"))
-    print(make_printer_request("1001", "set3#very_hard#5"))
+#    print(make_printer_request("1001", "set3#very_hard#5"))
 #    print(team_name("1003"))
+    print(list(get_the_team_question_in_hand(1003)))
     pass
 

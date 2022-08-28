@@ -6,6 +6,6 @@
     "Database_host":"localhost",
     "Database_name": "multivitamin",
     "Printer_URL":"http://127.0.0.1:5000",
-    "Max_Question_team":"4",
+    "Max_Question_team":"2",
     "Min_Score": "-20"
 }

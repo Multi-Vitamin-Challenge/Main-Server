@@ -4,21 +4,28 @@ import DataBaseTools
 
 config = DataBaseTools.read_config()
 
-mydb = mysql.connector.connect(
-  host=config["Database_host"],
-  user=config["Database_Username"],
-  password=config["Database_Password"],
-  database=config["Database_name"]
-)
+
 
 
 def run_without_ouput(sql):
+    mydb = mysql.connector.connect(
+    host=config["Database_host"],
+    user=config["Database_Username"],
+    password=config["Database_Password"],
+    database=config["Database_name"]
+    )
     mycursor = mydb.cursor()
     mycursor.execute(sql)
     mydb.commit()
 
 
 def run_with_output(sql):
+    mydb = mysql.connector.connect(
+    host=config["Database_host"],
+    user=config["Database_Username"],
+    password=config["Database_Password"],
+    database=config["Database_name"]
+    )    
     mycursor = mydb.cursor()
     mycursor.execute(sql)
     myresult = mycursor.fetchall()

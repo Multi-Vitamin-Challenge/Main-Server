@@ -31,14 +31,14 @@ class GiveQuestionToTeams(Resource):
             user_id = ServerTools.check_username_password(data["username"], data["password"])
         except:
             return '{message: password is wronge}'
-        if True:
+        try :
             response, question_id = make_printer_request(data["team_code"], data["question_type"])
-            inp = f"INSERT INTO multivitamin.printed_questions (idteam, idquestion, iduser_give, give_time) VALUES  ('{data['team_code']}','{question_id}', '{user_id}', '{datetime.now().strftime('%H:%M:%S') }');"
+            inp = f"INSERT INTO multivitamin.printed_questions (idteam, idquestion, iduser_give, time_give)  VALUES  ('{data['team_code']}','{question_id}', '{user_id}', '{datetime.now().strftime('%H:%M:%S') }');"
             DataBaseConnector.run_without_ouput(inp)
             inp = f"update multivitamin.teams set score=score-{type_money(data['question_type'])} where idteams={data['team_code']};"
             DataBaseConnector.run_without_ouput(inp)            
             return '{message: eveything is fine}'
-        else:
+        except:
             return '{message: error}'
 
 
