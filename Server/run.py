@@ -74,9 +74,21 @@ class PutScore(Resource):
         except:
             return '{message: error}'
 
+
+
+class ScoreBoard(Resource):
+    def get(self):
+        inp = f"SELECT name, score FROM multivitamin.teams"
+        ans = dict()
+        for i in DataBaseConnector.run_with_output(inp):
+            ans[i[0]] = i[1]
+        return ans
+
+
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
 api.add_resource(PutScore, '/questions/score')
+api.add_resource(ScoreBoard, "/board/score")
 
 
 
