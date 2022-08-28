@@ -5,7 +5,7 @@
     "Printer_Password": "helloworld",
     "Database_host":"localhost",
     "Database_name": "multivitamin",
-    "Printer_URL":"http://127.0.0.1:5000",
+    "Printer_URL":"http://192.168.1.2:5000",
     "Max_Question_team":"2",
     "Min_Score": "-20"
 }

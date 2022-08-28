@@ -21,23 +21,28 @@ app = Flask(__name__)
 api = Api(app)
 
 
-
 class GiveQuestionToTeams(Resource):
     def post(self):
         data = request.get_json(force=True)
         try:
             user_id = ServerTools.check_username_password(data["username"], data["password"])
         except:
-            return '{message: password is wronge}'
+            temp = dict()
+            temp["message"] = "password is wrong"
+            return temp
         try:
             response, question_id = make_printer_request(data["team_code"], data["question_type"])
             inp = f"INSERT INTO multivitamin.printed_questions (idteam, idquestion, iduser_give, time_give)  VALUES  ('{data['team_code']}','{question_id}', '{user_id}', '{datetime.now().strftime('%H:%M:%S') }');"
             DataBaseConnector.run_without_ouput(inp)
             inp = f"update multivitamin.teams set score=score-{type_money(data['question_type'])} where idteams={data['team_code']};"
-            DataBaseConnector.run_without_ouput(inp)            
-            return '{message: eveything is fine}'
+            DataBaseConnector.run_without_ouput(inp)  
+            temp = dict()
+            temp["message"] = "eveything is fine"
+            return temp
         except:
-            return '{message: error}'
+            temp = dict()
+            temp["message"] = "error"
+            return temp
 
 class GetQuestionFromTeam(Resource):
     def post(self):
@@ -45,14 +50,20 @@ class GetQuestionFromTeam(Resource):
         try:
             user_id = ServerTools.check_username_password(data["username"], data["password"])
         except:
-            return '{message: password is wronge}'
+            temp = dict()
+            temp["message"] = "password is wrong"
+            return temp
 
         try:
             inp = f"UPDATE `multivitamin`.`printed_questions` SET `iduser_get` = '{user_id}', `time_get` = '{datetime.now().strftime('%H:%M:%S')}', `status` = '1' WHERE (idteam={data['team_code']} AND idquestion={data['question_code']});"
             DataBaseConnector.run_without_ouput(inp)
-            return '{message: eveything is fine}'
+            temp = dict()
+            temp["message"] = "eveything is fine"
+            return temp
         except:
-            return '{message: error}'
+            temp = dict()
+            temp["message"] = "error"
+            return temp
 
 
 class PutScore(Resource):
@@ -61,7 +72,9 @@ class PutScore(Resource):
         try:
             user_id = ServerTools.check_username_password(data["username"], data["password"])
         except:
-            return '{message: password is wronge}'
+            temp = dict()
+            temp["message"] = "password is wrong"
+            return temp
 
         try:
             inp = f"UPDATE `multivitamin`.`printed_questions` SET `iduser_score` = '{user_id}',status=2, `time_score` = '{datetime.now().strftime('%H:%M:%S')}', `score` = '{data['score']}' WHERE (idteam={data['team_code']} AND idquestion={data['question_code']} AND status=1);"
@@ -69,10 +82,16 @@ class PutScore(Resource):
             if x>0:
                 inp = f"update multivitamin.teams set score=score+{data['score']} where idteams={data['team_code']};"
                 DataBaseConnector.run_without_ouput(inp)     
-                return '{message: eveything is fine}'
-            return '{message: nothing changed}'
+                temp = dict()
+                temp["message"] = "eveything is fine"
+                return temp
+            temp = dict()
+            temp["message"] = "nothing changed"
+            return temp
         except:
-            return '{message: error}'
+            temp = dict()
+            temp["message"] = "error"
+            return temp
 
 
 
@@ -84,16 +103,31 @@ class ScoreBoard(Resource):
             ans[i[0]] = i[1]
         return ans
 
+class PasswordCheck(Resource):
+    def post(self):
+        data = request.get_json(force=True)
+        try:
+            user_id = ServerTools.check_username_password(data["username"], data["password"])
+            temp = dict()
+            temp["message"] = "password is correct"
+            temp["status"] = "200"
+            return temp
+        except:
+            temp = dict()
+            temp["message"] = "password is wrong"
+            temp["status"] = "400"
+            return temp
+
 
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
 api.add_resource(PutScore, '/questions/score')
 api.add_resource(ScoreBoard, "/board/score")
-
+api.add_resource(PasswordCheck, "/user/input")
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=3000, host="192.168.1.2")
 
 
 """
