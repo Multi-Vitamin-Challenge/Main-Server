@@ -56,9 +56,13 @@ class GetQuestionFromTeam(Resource):
 
         try:
             inp = f"UPDATE `multivitamin`.`printed_questions` SET `iduser_get` = '{user_id}', `time_get` = '{datetime.now().strftime('%H:%M:%S')}', `status` = '1' WHERE (idteam={data['team_code']} AND idquestion={data['question_code']});"
-            DataBaseConnector.run_without_ouput(inp)
+            x = DataBaseConnector.run_without_ouput(inp)
             temp = dict()
-            temp["message"] = "eveything is fine"
+            if x > 0:
+                temp["message"] = "eveything is fine"
+            else:
+                temp["message"] = "nothing changed"
+
             return temp
         except:
             temp = dict()
