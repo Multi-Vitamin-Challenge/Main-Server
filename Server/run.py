@@ -192,19 +192,20 @@ class BuyQuestion(Resource):
         temp = dict()
         temp["message"] = "everything is ok"
         return temp
-                
-        # read auction tables content of chosen row -> done
-        # check if the team can but the question -> done
-        # take the moeny from team -> done
-        # check if the team hasn't got the question -> done
-        # updae printed_question -> done 
-        # update auction table and -> done 
-        # print the question for student -> done 
+
+class AuctionBoard(Resource):
+    def get(self):
+        inp = f"SELECT * FROM multivitamin.auction WHERE status=0"
+        ans = dict()
+        for i in DataBaseConnector.run_with_output(inp):
+            ans[i[2]] = i[3]
+        return ans
 
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
 api.add_resource(PutScore, '/questions/score')
 api.add_resource(ScoreBoard, "/board/score")
+api.add_resource(AuctionBoard, "/board/auction")
 api.add_resource(PasswordCheck, "/user/input")
 api.add_resource(SellQuestion, "/auction/get")
 api.add_resource(BuyQuestion, "/auction/give")
