@@ -1,9 +1,10 @@
 from flask import Flask,request ,jsonify
 from flask_restful import reqparse, abort, Api, Resource
+from ChooseQuestion import choose_question , team_money
 import ServerTools
 import os
 import sys 
-from ChooseQuestion import make_printer_request, type_money
+from ChooseQuestion import make_printer_request, type_money, make_printer_request_special
 from datetime import datetime
 import socket
 
@@ -158,9 +159,47 @@ class BuyQuestion(Resource):
             temp = dict()
             temp["message"] = "password is wrong"
             return temp
-        # update auction table and read its content of chosen row
-        # updae printed_question 
-        # print the question for student 
+        inp = f"SELECT * FROM multivitamin.auction WHERE idauction={data['idauction']} AND status=0"
+        database = DataBaseConnector.run_with_output(inp)
+        if len(database) < 1:
+            temp = dict()
+            temp["message"] = "nothing to buy"
+            return temp
+        database = database[0]
+        if team_money(data["team_code"]) < database[3]:
+            temp = dict()
+            temp["message"] = "teams doesn't have enough money"
+            return temp
+
+        inp = f"SELECT * FROM multivitamin.printed_questions WHERE idteam={data['team_code']} AND idquestion={database[2]}"
+        
+        if len(DataBaseConnector.run_with_output(inp)) > 0:
+            temp = dict()
+            temp["message"] = "teams has got this question before"
+            return temp
+
+        inp = f"update multivitamin.teams set score=score-{database[3]} where idteams={data['team_code']};"
+        DataBaseConnector.run_without_ouput(inp) 
+
+        inp = f"INSERT INTO multivitamin.printed_questions (idteam, idquestion, iduser_give, time_give)  VALUES  ('{data['team_code']}','{database[2]}', '{user_id}', '{datetime.now().strftime('%H:%M:%S') }');"
+        DataBaseConnector.run_without_ouput(inp)
+
+        inp = f"UPDATE `multivitamin`.`auction` SET `idteam_buy` = {data['team_code']}, `User_buy` = {user_id}, `status` = '1' WHERE (`idauction` = {data['idauction']});"
+        DataBaseConnector.run_without_ouput(inp)
+        
+        make_printer_request_special(data["team_code"], database[2], database[3])
+
+        temp = dict()
+        temp["message"] = "everything is ok"
+        return temp
+                
+        # read auction tables content of chosen row -> done
+        # check if the team can but the question -> done
+        # take the moeny from team -> done
+        # check if the team hasn't got the question -> done
+        # updae printed_question -> done 
+        # update auction table and -> done 
+        # print the question for student -> done 
 
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
