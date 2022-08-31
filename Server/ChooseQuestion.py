@@ -19,12 +19,21 @@ import DataBaseConnector
 
 config = ServerTools.read_config()
 
-def get_the_question_structure(question_type):
+def get_the_question_structure(question_type="?"):
     """make a request to the printer server and get the sturecture of the questions and return 
     the questions of the input type"""
     url = config["Printer_URL"]+"/structure"
     x = requests.get(url)
+    if question_type == "?":
+        return json.loads(x.text)
     return json.loads(x.text)[question_type]
+
+
+def give_type(question_id):
+    question_id = str(question_id)+'.pdf'
+    for i in get_the_question_structure().items():
+        if question_id in i[1]:
+            return i[0]
 
 def get_the_team_question(team_id):
     """return all the questions of the input team"""
@@ -97,6 +106,26 @@ def make_printer_request(team_id, question_type):
     x = requests.post(url, json= req)
     return json.loads(x.text), question_number
     
+
+def make_printer_request_special(team_id, question_number, price):
+    req = dict()
+    question_type = give_type(question_number)
+    req["username"] = config["Printer_UserName"]
+    req["password"] = config["Printer_Password"]
+    req["question_address"] = "\\"+question_type +"\\" + str(question_number)+".pdf"
+    req["question_code"] = str(question_number)
+    req["major"] = str(question_type.split("#")[0])
+    req["question_type"] = str(question_type.split("#")[1])
+    req["recive_time"] = datetime.now().strftime("%H:%M:%S") 
+    req["price"] = str(price)
+    req["team_code"] = str(team_id)
+    req["team_name"] = team_name(team_id)
+    req["score"] = str(- price+ int(team_money(team_id)))
+
+    url = config["Printer_URL"]+"/print"
+    x = requests.post(url, json= req)
+    return json.loads(x.text), question_number
+    
 if __name__=="__main__":
     #print(get_the_question_structure("set3"))
     #print(list(get_the_team_question(1001)))
@@ -106,6 +135,7 @@ if __name__=="__main__":
 #    print(give_question(1003, "set3#5"))
 #    print(make_printer_request("1001", "set3#very_hard#5"))
 #    print(team_name("1003"))
-    print(list(get_the_team_question_in_hand(1003)))
+#    print(list(get_the_team_question_in_hand(1003)))
+    print(give_type(22))
     pass
 

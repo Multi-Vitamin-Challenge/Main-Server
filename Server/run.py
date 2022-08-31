@@ -5,6 +5,8 @@ import os
 import sys 
 from ChooseQuestion import make_printer_request, type_money
 from datetime import datetime
+import socket
+
 
 def setup():
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -69,7 +71,6 @@ class GetQuestionFromTeam(Resource):
             temp["message"] = "error"
             return temp
 
-
 class PutScore(Resource):
     def post(self):
         data = request.get_json(force=True)
@@ -97,8 +98,6 @@ class PutScore(Resource):
             temp["message"] = "error"
             return temp
 
-
-
 class ScoreBoard(Resource):
     def get(self):
         inp = f"SELECT name, score FROM multivitamin.teams"
@@ -122,16 +121,43 @@ class PasswordCheck(Resource):
             temp["status"] = "400"
             return temp
 
+class SellQuestion(Resource):
+    def post(self):
+        data = request.get_json(force=True)
+        try:
+            user_id = ServerTools.check_username_password(data["username"], data["password"])
+        except:
+            temp = dict()
+            temp["message"] = "password is wrong"
+            return temp
+
+        try:
+            inp = f"UPDATE `multivitamin`.`printed_questions` SET `iduser_get` = '{user_id}', `time_get` = '{datetime.now().strftime('%H:%M:%S')}', `status` = '1' WHERE (idteam={data['team_code']} AND idquestion={data['question_code']});"
+            x = DataBaseConnector.run_without_ouput(inp)
+            
+            temp = dict()
+            if x > 0:
+                inp = f"INSERT INTO `multivitamin`.`auction` (`idteam_sell`, `idquestion`, `price`, `User_sell`) VALUES ({data['team_code']}, {data['question_code']}, {data['price']}, {user_id});"
+                x = DataBaseConnector.run_without_ouput(inp)
+                temp["message"] = "eveything is fine"
+            else:
+                temp["message"] = "nothing changed"
+
+            return temp
+        except:
+            temp = dict()
+            temp["message"] = "error"
+            return temp    
 
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
 api.add_resource(PutScore, '/questions/score')
 api.add_resource(ScoreBoard, "/board/score")
 api.add_resource(PasswordCheck, "/user/input")
-
+api.add_resource(SellQuestion, "/auction/get")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000, host="192.168.1.2")
+    app.run(debug=True, port=3000, host=socket.gethostbyname_ex(socket.gethostname())[-1][-1])
 
 
 """
