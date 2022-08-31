@@ -149,12 +149,26 @@ class SellQuestion(Resource):
             temp["message"] = "error"
             return temp    
 
+class BuyQuestion(Resource):
+   def post(self):
+        data = request.get_json(force=True)
+        try:
+            user_id = ServerTools.check_username_password(data["username"], data["password"])
+        except:
+            temp = dict()
+            temp["message"] = "password is wrong"
+            return temp
+        # update auction table and read its content of chosen row
+        # updae printed_question 
+        # print the question for student 
+
 api.add_resource(GiveQuestionToTeams, '/questions/give')
 api.add_resource(GetQuestionFromTeam, '/questions/get')
 api.add_resource(PutScore, '/questions/score')
 api.add_resource(ScoreBoard, "/board/score")
 api.add_resource(PasswordCheck, "/user/input")
 api.add_resource(SellQuestion, "/auction/get")
+api.add_resource(BuyQuestion, "/auction/give")
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000, host=socket.gethostbyname_ex(socket.gethostname())[-1][-1])
