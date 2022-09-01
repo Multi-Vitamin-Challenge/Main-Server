@@ -181,6 +181,9 @@ class BuyQuestion(Resource):
         inp = f"update multivitamin.teams set score=score-{database[3]} where idteams={data['team_code']};"
         DataBaseConnector.run_without_ouput(inp) 
 
+        inp = f"update multivitamin.teams set score=score+{database[3]} where idteams={database[1]};"
+        DataBaseConnector.run_without_ouput(inp) 
+
         inp = f"INSERT INTO multivitamin.printed_questions (idteam, idquestion, iduser_give, time_give)  VALUES  ('{data['team_code']}','{database[2]}', '{user_id}', '{datetime.now().strftime('%H:%M:%S') }');"
         DataBaseConnector.run_without_ouput(inp)
 

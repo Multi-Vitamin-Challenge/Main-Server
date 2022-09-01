@@ -110,6 +110,7 @@ def make_printer_request(team_id, question_type):
 def make_printer_request_special(team_id, question_number, price):
     req = dict()
     question_type = give_type(question_number)
+    
     req["username"] = config["Printer_UserName"]
     req["password"] = config["Printer_Password"]
     req["question_address"] = "\\"+question_type +"\\" + str(question_number)+".pdf"
